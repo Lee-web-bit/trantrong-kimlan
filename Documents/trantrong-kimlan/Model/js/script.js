@@ -1,0 +1,209 @@
+// script.js
+// Countdown to Oct 12, 2025 12:00 PM
+const weddingDate = new Date('2025-10-12T12:00:00');
+
+function updateCountdown() {
+  const now = new Date();
+  const diff = weddingDate - now;
+
+  const daysEl = document.getElementById('days');
+  const hoursEl = document.getElementById('hours');
+  const minutesEl = document.getElementById('minutes');
+  const secondsEl = document.getElementById('seconds');
+
+  if (diff <= 0) {
+    if (daysEl) daysEl.textContent = '0';
+    if (hoursEl) hoursEl.textContent = '0';
+    if (minutesEl) minutesEl.textContent = '0';
+    if (secondsEl) secondsEl.textContent = '0';
+    return;
+  }
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  // Cập nhật DOM chỉ khi phần tử tồn tại
+  if (daysEl) daysEl.textContent = days;
+  if (hoursEl) hoursEl.textContent = hours;
+  if (minutesEl) minutesEl.textContent = minutes;
+  if (secondsEl) secondsEl.textContent = seconds;
+}
+
+// Calendar for October 2025
+function renderCalendar() {
+  const calendarDaysEl = document.getElementById('calendar-days');
+  if (!calendarDaysEl) return;
+
+  const daysInOct = 31;
+  const firstDay = new Date(2025, 9, 1).getDay(); // 9 = October (0-based)
+  const startOffset = (firstDay + 6) % 7; // Adjust for MON start (0=Sun, 1=Mon... 6=Sat)
+
+  let html = '';
+  let dayCount = 1;
+
+  for (let i = 0; i < 6; i++) { // Tối đa 6 hàng
+    let weekStarted = false;
+    for (let j = 0; j < 7; j++) {
+      if (i === 0 && j < startOffset) {
+        html += '<div class="day empty"></div>';
+      } else if (dayCount <= daysInOct) {
+        weekStarted = true;
+        // Ngày 12 là ngày cưới
+        const isWeddingDay = dayCount === 12;
+        html += `<div class="day ${isWeddingDay ? 'today' : ''}">${dayCount}</div>`;
+        dayCount++;
+      } else {
+        // Chỉ thêm empty nếu đã bắt đầu tuần
+        if (weekStarted) {
+           html += '<div class="day empty"></div>';
+        }
+      }
+    }
+    // Dừng nếu không còn ngày nào trong tháng
+    if (dayCount > daysInOct && i > 3) break;
+  }
+  calendarDaysEl.innerHTML = html;
+}
+
+// Confetti Animation
+function createConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  // Đặt kích thước canvas
+  function setCanvasSize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+  }
+  setCanvasSize();
+  window.addEventListener('resize', setCanvasSize);
+
+  const particles = [];
+  
+  // ĐÃ SỬA LỖI: Thay thế biến CSS var(--primary) và var(--gold) bằng giá trị Hex
+  const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f', '#d4a373', '#f4e1c1'];
+
+  function Particle() {
+    this.x = Math.random() * canvas.width;
+    // Bắt đầu từ phía trên màn hình
+    this.y = -Math.random() * canvas.height; 
+    this.size = Math.random() * 4 + 2;
+    this.speedX = Math.random() * 2 - 1; // Rơi ngang nhẹ
+    this.speedY = Math.random() * 2 + 1; // Tốc độ rơi
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+    this.rotation = Math.random() * 360; // Thêm xoay
+    this.rotationSpeed = Math.random() * 0.2 + 0.05;
+  }
+
+  Particle.prototype.update = function() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    this.rotation += this.rotationSpeed;
+    
+    // Giảm dần opacity/size khi gần chạm đáy
+    if (this.y > canvas.height * 0.8 && this.size > 0) {
+      this.size -= 0.05;
+    }
+  };
+
+  Particle.prototype.draw = function() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation * Math.PI / 180);
+    ctx.fillStyle = this.color;
+    ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size); // Thay bằng hình vuông để trông như confetti
+    ctx.restore();
+  };
+
+  function handleParticles() {
+    // Chỉ tạo thêm hạt nếu đếm ngược chưa kết thúc và số lượng hạt ít
+    if (particles.length < 50 && (weddingDate - new Date()) > 0) {
+      particles.push(new Particle());
+    }
+
+    for (let i = 0; i < particles.length; i++) {
+      particles[i].update();
+      particles[i].draw();
+
+      // Loại bỏ hạt khi nó biến mất hoặc rơi ra khỏi màn hình
+      if (particles[i].size <= 0.2 || particles[i].y > canvas.height + 20) {
+        particles.splice(i, 1);
+        i--;
+      }
+    }
+  }
+
+  let animationFrameId;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    handleParticles();
+    animationFrameId = requestAnimationFrame(animate);
+  }
+
+  // Khởi động animation
+  animate();
+}
+
+// Trigger animations on load
+window.addEventListener('load', () => {
+  updateCountdown();
+  // Cập nhật đếm ngược mỗi giây
+  setInterval(updateCountdown, 1000); 
+  
+  renderCalendar();
+  createConfetti();
+
+  // Stagger animations
+  const elements = document.querySelectorAll('.fade-in, .slide-up, .zoom-in, .rotate-in, .bounce');
+  elements.forEach((el, index) => {
+    // Tăng độ trễ cho các animation xuất hiện sau
+    el.style.animationDelay = `${index * 0.15}s`; 
+  });
+});
+// Pop-up Modal Logic
+// script.js (Tìm và thay thế đoạn xử lý form)
+
+// Pop-up Modal Logic
+window.addEventListener('load', () => {
+    // ... (Giữ nguyên các hàm khởi tạo cũ: updateCountdown, renderCalendar, createConfetti, Stagger animations) ...
+
+    // Lấy các phần tử modal và form
+    const modal = document.getElementById("thankYouModal");
+    const closeButton = document.querySelector(".close-button");
+    const form = document.getElementById("confirmationForm"); // Lấy form theo ID mới
+    const hiddenIframe = document.getElementById("hidden_iframe");
+
+    if (form) {
+        // Xử lý sự kiện khi form được gửi
+        form.addEventListener('submit', function(event) {
+            
+            // Dữ liệu được gửi đến Google Form thông qua hidden_iframe (target="_blank" cũ đã được thay bằng target="hidden_iframe")
+            
+            // 1. Sau khi form gửi đi, hiển thị modal
+            modal.style.display = "block";
+            
+            // 2. Reset form để người dùng không gửi trùng lặp
+            // Chúng ta dùng timeout để đảm bảo form kịp gửi dữ liệu trước khi reset
+            setTimeout(() => {
+                form.reset(); 
+            }, 1000); 
+        });
+    }
+
+    // Đóng modal khi click vào nút X
+    if (closeButton) {
+        closeButton.onclick = function() {
+            modal.style.display = "none";
+        }
+    }
+
+    // Đóng modal khi click ra ngoài
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+});
