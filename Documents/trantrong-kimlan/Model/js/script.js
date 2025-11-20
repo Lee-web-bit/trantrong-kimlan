@@ -156,19 +156,18 @@ window.addEventListener('load', () => {
   renderCalendar();
   createConfetti();
 
-  // Stagger animations
-  const elements = document.querySelectorAll('.fade-in, .slide-up, .zoom-in, .rotate-in, .bounce');
-  elements.forEach((el, index) => {
-    // Tăng độ trễ cho các animation xuất hiện sau
-    el.style.animationDelay = `${index * 0.15}s`; 
+  // --- THÊM: KHỞI TẠO AOS (Animation On Scroll) ---
+  AOS.init({
+    duration: 800,      // Thời gian animation (ms)
+    easing: 'ease-in-out', // Hiệu ứng
+    once: true,         // Chỉ chạy animation 1 lần khi cuộn qua
+    offset: 100         // Bắt đầu animation sớm hơn 100px so với khi vào viewport
   });
+  // ----------------------------------------------------
 });
-// Pop-up Modal Logic
-// script.js (Tìm và thay thế đoạn xử lý form)
 
 // Pop-up Modal Logic
 window.addEventListener('load', () => {
-    // ... (Giữ nguyên các hàm khởi tạo cũ: updateCountdown, renderCalendar, createConfetti, Stagger animations) ...
 
     // Lấy các phần tử modal và form
     const modal = document.getElementById("thankYouModal");

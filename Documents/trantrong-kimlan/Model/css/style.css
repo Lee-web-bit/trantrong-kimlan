@@ -24,17 +24,6 @@ body {
 }
 
 /* Thêm viền bao quanh (Border effect) */
-/* style.css (Tìm đoạn này) */
-.container {
-  max-width: 420px;
-  margin: 0 auto;
-  background: white;
-  min-height: 100vh;
-  position: relative;
-  box-shadow: 0 0 30px rgba(0,0,0,0.1);
-}
-
-
 .container {
   max-width: 420px;
   margin: 0 auto;
@@ -241,7 +230,6 @@ body {
   letter-spacing: 1px;
   font-size: 0.8rem;
 }
-/* style.css (Thêm vào phần Main Content) */
 
 /* STORY & PHOTO GRID */
 .story-grid {
@@ -554,7 +542,6 @@ body {
         transform: translateY(-50%) rotate(90deg);
     }
 }
-/* style.css (Thêm vào cuối file) */
 
 /* Photo Section */
 .photo-section {
@@ -650,7 +637,7 @@ body {
   transform-origin: 100% 50%; /* Điểm xoay */
   font-family: 'Playfair Display', serif;
   font-size: 1.5rem;
-  color: #c0c0c0; /* Màu xám nhạt */
+  color: #c2c1c1; /* Màu xám nhạt */
   letter-spacing: 2px;
   opacity: 0;
   animation: fadeInRotate 1s ease-out forwards 1s; /* Animation chậm hơn nữa */
@@ -690,6 +677,7 @@ body {
   .highlight { font-size: 0.75rem; padding: 0.6rem 1rem; }
   .main { padding: 1.5rem 1rem; }
 }
+
 /* POP-UP MODAL STYLE */
 .modal {
     display: none; /* Ẩn ban đầu */
@@ -743,4 +731,160 @@ body {
 .close-button:focus {
     color: var(--text);
     text-decoration: none;
+}
+
+/* --- THÊM: Background 2 bên (Nhà Trai - Nhà Gái) --- */
+.split-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Đảm bảo background nằm dưới nội dung */
+  display: none; /* Mặc định ẩn trên di động */
+}
+
+/* Ảnh nền bên trái (Nhà Trai) */
+.split-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  /* Thay thế bằng ảnh Nhà Trai của bạn */
+  background-image: url('../Model/image/img-nhatrai.jpg'); 
+  background-size: cover;
+  background-position: center;
+  /* Lớp phủ màu đen 50% để ảnh mờ đi, không làm chói mắt */
+  background-blend-mode: multiply; 
+  background-color: rgba(0, 0, 0, 0.5); 
+  transition: opacity 1s ease-in-out;
+  opacity: 0.2; /* Mờ nhẹ, chỉ làm nền */
+}
+
+/* Ảnh nền bên phải (Nhà Gái) */
+.split-background::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  /* Thay thế bằng ảnh Nhà Gái của bạn */
+  background-image: url('../Model/image/img-nhagai.jpg'); 
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: multiply;
+  background-color: rgba(0, 0, 0, 0.5); 
+  transition: opacity 1s ease-in-out;
+  opacity: 0.2; /* Mờ nhẹ, chỉ làm nền */
+}
+
+/* Kích hoạt background trên màn hình lớn (ví dụ: > 900px) */
+@media (min-width: 900px) {
+  .split-background {
+    display: block; /* Hiện background 2 bên */
+  }
+  /* Cải thiện bóng đổ cho nội dung chính nổi bật hơn trên nền ảnh */
+  .container {
+    box-shadow: 0 0 50px rgba(0,0,0,0.3); 
+    border-radius: 15px;
+  }
+}
+
+/* --- CẢI THIỆN CHUYỂN ĐỘNG (Dùng AOS thay vì các keyframes phức tạp) --- */
+/* Đảm bảo các phần tử được animation bắt đầu với opacity 0 */
+/* Tắt các animation delay cũ để AOS kiểm soát */
+.fade-in, .slide-up, .zoom-in, .rotate-in, .bounce, .date-item, .time-unit {
+    opacity: 0;
+    /* Loại bỏ các animation mặc định để AOS kiểm soát */
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Dùng lớp 'animated' do AOS thêm vào để kích hoạt hiệu ứng */
+.animated {
+    opacity: 1 !important;
+}
+
+/* Thêm các hiệu ứng cơ bản (AOS sẽ thêm lớp này) */
+.aos-animate.fade-in {
+    opacity: 1;
+    transition: opacity 1s ease;
+}
+
+.aos-animate.slide-up {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+/* Đặt trạng thái ban đầu cho các hiệu ứng (AOS sẽ cần) */
+[data-aos="fade-up"] {
+    transform: translateY(20px);
+}
+[data-aos="zoom-in"] {
+    transform: scale(0.9);
+}
+[data-aos="rotate-in"] {
+    transform: rotate(10deg) scale(0.9);
+}
+/* --- THÊM: Background 2 bên (Nhà Trai - Nhà Gái) --- */
+.split-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Đảm bảo background nằm dưới nội dung */
+  display: none; /* Mặc định ẩn trên di động */
+  background: var(--light-gray); /* Nền dự phòng cho màn hình lớn khi ảnh chưa load */
+}
+
+/* Ảnh nền bên trái (Nhà Trai) */
+.split-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  /* Thay thế bằng ảnh Nhà Trai của bạn */
+  background-image: url('../image/HTH08441.jpg'); 
+  background-size: cover;
+  background-position: center;
+  /* Lớp phủ màu đen và chế độ hòa trộn để làm mờ ảnh, tạo độ tương phản */
+  background-blend-mode: multiply; 
+  background-color: rgba(0, 0, 0, 0.5); 
+  opacity: 1; /* Độ mờ */
+}
+
+/* Ảnh nền bên phải (Nhà Gái) */
+.split-background::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  /* Thay thế bằng ảnh Nhà Gái của bạn */
+  background-image: url('../image/HTH08654_1.jpg'); 
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: multiply;
+  background-color: rgba(0, 0, 0, 0.5); 
+  opacity: 1; /* Độ mờ */
+}
+
+/* Kích hoạt background trên màn hình lớn (>= 900px) */
+@media (min-width: 900px) {
+  .split-background {
+    display: block; /* Hiện background 2 bên */
+  }
+  /* Cải thiện bóng đổ cho nội dung chính nổi bật hơn trên nền ảnh */
+  .container {
+    box-shadow: 0 0 50px rgba(0,0,0,0.4); 
+    border-radius: 15px;
+  }
 }
